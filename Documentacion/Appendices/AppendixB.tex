@@ -1,0 +1,28 @@
+% Appendix A
+
+\chapter{Aspectos generales de la implementación} % Main appendix title
+
+\label{AppendixB} % For referencing this appendix elsewhere, use \ref{AppendixB}
+
+\lhead{Appendix B. \emph{Aspectos generales de la implementación}} % This is for the header on each page - perhaps a shortened title
+
+Este apéndice tiene como cometido explicar aspectos generales de la implementación, los cuales aplican para el algoritmo AC y MSW.\\
+El programa está compuesto por módulos escritos en C++ y C, los cuales son compilados utilizando GCC versión 4.2. Dentro del entregable se adjunta en el directorio "Fuentes"  un archivo {\it Makefile} que permite compilar la solución entregada en este proyecto.\\
+Los módulos del empaquetado final implementan la lógica necesaria para ejecutar los algoritmos AC y MSW.\\
+Todo el código desarrollado en este proyecto fue realizado por el autor del mismo salvo que se indique lo contrario.
+A continuación se describe brevemente cada uno de los módulos implementados.
+\begin{itemize}
+\item MSWGraph - Implementa la lógica necesaria para crear la estructura del algoritmo MSW, provee métodos para actualizar la estructura de datos al procesar el texto y obtener la cantidad de ocurrencias de un patrón específico.
+\item MSWNode - Especifica la estructura de cada nodo de MSW. 
+\item AhoCorasickNode - Especifica la estructura de cada nodo de AC. 
+\item AhoCorasickGraph - Implementa la lógica necesaria para crear la estructura de datos del algoritmo AC, provee un método para actualizar la misma a medida que se recorre el texto y almacena la cantidad de ocurrencias de cada patrón.
+\item Queue - Implementa la cola utilizada en la construcción de la función {\it failure} de AC.
+\item QueueNode - Implementa un nodo de {\it Queue}.
+\item Memory - Implementa un conjunto de funciones usadas para obtener medidas del consumo de memoria al ejecutar los diversos algoritmos. Los macro allí implementados y los métodos {\it getPeakRSS} y  {\it getCurrentRSS} fueron obtenidos de \href{http://goo.gl/4uZJKP}{Nadeau}.
+\item Main - Es el módulo principal, en el se concentra toda la lógica necesaria para leer archivos, interpretar los argumentos ingresados por el usuario y presentar los resultados finales.
+\end{itemize}
+Además de los módulos indicados en los puntos anteriores se creó un archivo de constantes ({\bf Const.h}), en el mismo se define un vector con todos los símbolos del alfabeto ({\bf alphabet}), el largo del mismo ({\bf ALPHABET\_SIZE}) y un arreglo, al cual nombramos \emph{ordchar}, que es utilizado para obtener en O(1) el índice que tiene asignado cada símbolo del alfabeto (representado en ASCII) en {\bf alphabet}. En este archivo de constantes se encuentra comentada la definición del macro {\bf KDEBUG}, al descomentar dicha línea se compila un conjunto de funciones útiles para realizar {\it debug}.\\
+Por motivos de rendimiento todos los atributos fueron declarados como públicos, a su vez, se implementaron en los archivos .h algunos métodos simples que son invocados de forma frecuente.
+\section{Lectura de archivos}
+El módulo principal {\it Main} realiza la lectura del archivo de patrones y del texto. Estos archivos difieren entre sí en que en el primero cada patrón está separado entre sí por un salto de línea, mientras que al leer los textos solo se admiten caracteres pertenecientes al alfabeto previamente establecido.\\
+Todas las lecturas son realizadas desde el comienzo del archivo hasta el final del mismo (lectura de izquierda a derecha). Para el caso de la lectura del juego de patrones se utiliza la función {\it getline} mientras que la lectura del texto se realiza de a bloque de caracteres de tamaño máximo configurable. El valor por defecto del tamaño del bloque de lectura es una página de memoria del sistema operativo sobre el cual se ejecuta.\\

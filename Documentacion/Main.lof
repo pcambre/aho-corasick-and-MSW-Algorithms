@@ -1,0 +1,29 @@
+\select@language {spanish}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Ejemplo del algoritmo de fuerza bruta}}{5}{figure.caption.15}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Ejemplo del algoritmo KMP}}{6}{figure.caption.17}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Ejemplo de aplicaci\IeC {\'o}n de la regla del car\IeC {\'a}cter malo}}{8}{figure.caption.20}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Regla del sufijo bueno}}{8}{figure.caption.25}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Ejemplo: trie}}{10}{figure.caption.28}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Ejemplo: \IeC {\'A}rbol de sufijos}}{12}{figure.caption.30}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Ejemplo: Funci\IeC {\'o}n goto}}{16}{figure.caption.34}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Ejemplo: funci\IeC {\'o}n goto y failure}}{18}{figure.caption.36}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Ejemplo: GCT}}{25}{figure.caption.124}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Ejemplo: $\mathcal {T}_{suf}$}}{26}{figure.caption.127}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Ejemplo: Clausura FSM}}{28}{figure.caption.129}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Ejemplo del algoritmo KMP}}{29}{figure.caption.130}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces gr\IeC {\'a}fica RSS}}{47}{figure.caption.296}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces gr\IeC {\'a}fica tiempo de ejecuci\IeC {\'o}n de pre procesamiento}}{49}{figure.caption.297}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Tiempos de procesamiento de la prueba 1 (medido en Mac)\relax }}{51}{figure.caption.300}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Tiempos de procesamiento de la prueba 2 (medido en Mac)\relax }}{52}{figure.caption.305}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Tiempos de procesamiento de la prueba 3 (medido en Mac)\relax }}{53}{figure.caption.310}
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Tiempos de procesamiento de la prueba 4 (medido en Mac)\relax }}{54}{figure.caption.315}
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Comparaci\IeC {\'o}n de tiempos entre las pruebas 1, 2, 3 y 4 (medido en Mac)\relax }}{55}{figure.caption.320}
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Tiempo promedio de procesamiento por bloques de lectura (medido en Mac)\relax }}{58}{figure.caption.330}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

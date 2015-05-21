@@ -1,0 +1,37 @@
+% Appendix A
+
+\chapter{Programa principal - PDG} % Main appendix title
+
+\label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
+\lhead{Appendix A. \emph{Programa principal - PDG}} % This is for the header on each page - perhaps a shortened title
+
+
+\begin{center}
+
+\begin{table}
+\captionof{table}{Argumentos del programa principal} \label{tab:PDGArgs} 
+\begin{tabular}{l p{10cm}}
+
+\hline\hline
+Argumento & Descripción\\
+\hline
+-m & Modo de ejecución (algoritmo seleccionado). 1 – Aho Corasick 2 – FSM\\
+-h & Imprime los argumentos aceptados por el programa\\
+-q & Cantidad de patrones a ser tenidos en cuenta\\
+-c & Ruta absoluta en la cual se encuentra el archivo con el texto\\
+-p & Ruta en la cual se encuentra el archivo con el conjunto de patrones a ser buscados\\
+-s & Tamaño del bloque de lectura del texto (tamaño de páginas). Por defecto se utiliza un blque de 1024 páginas.\\
+--printMemory & Imprime los valores RSS y VSZ del proceso (solo para sistemas operativos con procfs).\\
+--printPreTime & Imprime el tiempo en segundos que tarda en ejecutarse la creación de la estructura del algoritmo que se está ejecutando\\
+--readTime & Imprime el tiempo en segundos que tarda en ejecutarse la lectura completa del texto
+\\
+--readBlockTime & Imprime el tiempo en segundos que tarda en ejecutarse un bloque de lectura del texto\\
+--postTime & Imprime el tiempo en segundos que tarda en ejecutarse el post procesamiento del algoritmo (aplicable solo para MSW).\\
+--totalTime & Imprime el tiempo en segundos que tarda en ejecutar completamente el algoritmo.\\
+--finds & Imprime la cantidad de veces que se encontró cada uno de los patrones. \\
+--printComments & Imprime comentarios a la salida con el prefijo $\#$.\\
+\hline
+\end{tabular}
+\label{table:PDG}
+\end{table}
+\end{center}

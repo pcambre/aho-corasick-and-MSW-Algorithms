@@ -1,0 +1,193 @@
+\documentclass[11pt, a4paper, oneside]{Thesis} % Paper size, default font size and one-sided paper
+\graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
+
+% Paquetes
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{algorithmicx}
+\usepackage[ruled]{algorithm}
+\usepackage{tikz-qtree}
+\usepackage{algpseudocode}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows,automata}
+\usepackage[spanish]{babel}
+\renewcommand\shorthandsspanish{}
+
+\makeatletter
+\@namedef{thm}{\@thm{\let \thm@swap \@gobble \th@plain }{thm}{Teorema}}
+\@namedef{cor}{\@thm{\let \thm@swap \@gobble \th@plain }{thm}{Corolario}}
+\@namedef{prop*}{\@thm {\th@plain }{}{Proposici\'on}}
+\@namedef{example*}{\@thm {\th@definition }{}{Ejemplo}}
+\@namedef{xca}{\@thm{\let \thm@swap \@gobble \th@definition }{thm}{Ejercicio}}
+\@namedef{rem*}{\@thm {\th@remark }{}{Observaci\'on}}
+\makeatother
+
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+\begin{document}
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+\setstretch{1.3} % Line spacing of 1.3
+
+% Define the page headers using the FancyHdr package and set up for one-sided printing
+\fancyhead{} % Clears all page headers and footers
+\rhead{\thepage} % Sets the right side header to show the page number
+\lhead{} % Clears the left side page header
+
+\pagestyle{fancy} % Finally, use the "fancy" page style to implement the FancyHdr headers
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\lstlistingname}{Código}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % New command to make the lines in the %----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+\begin{center}
+
+\textsc{\LARGE \univname}\\[1.5cm] % University name
+\textsc{\Large Proyecto de grado}\\[0.5cm] % Thesis type
+
+\HRule \\[0.4cm] % Horizontal line
+{\huge \bfseries \ttitle}\\[0.4cm] % Thesis title
+\HRule \\[1.5cm] % Horizontal line
+ 
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Autor:}\\
+{\authornames} % Author name - remove the \href bracket to remove the link
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Tutor:} \\
+{\supname} % Supervisor name - remove the \href bracket to remove the link  
+\end{flushright}
+\end{minipage}\\[3cm]
+\groupname\\\deptname\\[2cm] % Research group name and department name
+ 
+{\large \today}\\[4cm] % Date
+%\includegraphics{Logo} % University/department logo - uncomment to place it
+ 
+\vfill
+\end{center}
+
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+\setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
+
+\acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+Llegar a esta instancia de la carrera implica haber reocorrido un camino lleno de aprendizajes y desafíos. Este camino tuve la suerte de hacerlo y disfrutarlo acompañado por familiares, amigos y compañeros con quienes compartí inumerables tardes y noches de estudio.\\
+La realización de este proyecto de grado fue posible gracias a la ayuda y guía de mi tutor, Alvaro Martín, a quien agradezco mucho por su apoyo incondicional.
+Agradezco a la Universidad de la República que hizo posible mi sueño de estudiar ingeniería, brindándome una profesión y sobre todo un ambiente donde crecí como persona.\\
+Quiero agradecer especialmente a mi madre y familiares que desde el principio estuvieron apoyándome en la realización de esta carrera y a Mariana, mi novia, quién es fuente inagotable de motivación e inspiración.
+
+}
+\clearpage % Start a new page
+
+%----------------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy} % The page style headers have been "empty" all this time, now use the "fancy" headers as defined before to bring them back
+
+\lhead{\emph{Contents}} % Set the left side page header to "Contents"
+\tableofcontents % Write out the Table of Contents
+
+\lhead{\emph{List of Figures}} % Set the left side page header to "List of Figures"
+\listoffigures % Write out the List of Figures
+
+\lhead{\emph{List of Tables}} % Set the left side page header to "List of Tables"
+\listoftables % Write out the List of Tables
+
+%----------------------------------------------------------------------------------------
+%	ABBREVIATIONS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+
+\setstretch{1.5} % Set the line spacing to 1.5, this makes the following tables easier to read
+
+\lhead{\emph{Abreviaciones}} % Set the left side page header to "Abbreviations"
+\listofsymbols{ll} % Include a list of Abbreviations (a table of two columns)
+{
+\textbf{AC} & \textbf{A}ho \textbf{C}orasick\\
+\textbf{BM} & \textbf{B}oyer  \textbf{M}oore\\
+\textbf{FSM} & \textbf{F}inite  \textbf{S}ate  \textbf{M}achine \\
+\textbf{GCT} & \textbf{G}eneralized \textbf{C}ontext \textbf{T}ree\\
+\textbf{KMP} & \textbf{K}nuth  \textbf{M}orris  \textbf{P}ratt \\
+\textbf{MSW} & \textbf{M}artín \textbf{S}eroussi \textbf{W}einberger\\
+\textbf{RSS} & \textbf{R}esident \textbf{S}et \textbf{S}ize\\
+\textbf{VSZ} & \textbf{V}irtual \textbf{S}et \textbf{S}ize\\
+
+
+
+%\textbf{Acronym} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or \\
+}
+
+%----------------------------------------------------------------------------------------
+%	DEDICATION
+%----------------------------------------------------------------------------------------
+
+%\setstretch{1.3} % Return the line spacing back to 1.3
+
+%\pagestyle{empty} % Page style needs to be empty for this page
+
+%\dedicatory{For/Dedicated to/To my\ldots} % Dedication text
+
+%\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter % Begin numeric (1,2,3...) page numbering
+
+\pagestyle{fancy} % Return the page headers back to the "fancy" style
+
+% Include the chapters of the thesis as separate files from the Chapters folder
+% Uncomment the lines as you write the chapters
+\input{Chapters/Introduction}
+\input{Chapters/Chapter1}
+\input{Chapters/Chapter2}
+\input{Chapters/Chapter3}
+\input{Chapters/Chapter4}
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - APPENDICES
+%----------------------------------------------------------------------------------------
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\appendix % Cue to tell LaTeX that the following 'chapters' are Appendices
+
+% Include the appendices of the thesis as separate files from the Appendices folder
+% Uncomment the lines as you write the Appendices
+
+\input{Appendices/AppendixA}
+\input{Appendices/AppendixB}
+\input{Appendices/AppendixC}
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\backmatter
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{plain}
+\bibliography{Referencias}
+\end{document}

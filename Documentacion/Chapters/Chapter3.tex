@@ -1,0 +1,494 @@
+% Chapter 1
+
+\chapter{Algoritmo basado en la clausura FSM de un árbol de patrones (MSW)} % Main chapter title
+
+\label{Chapter3} % For referencing the chapter elsewhere, use \ref{Chapter3} 
+
+\lhead{Chapter 4. \emph{Algoritmo basado en la clausura FSM de un árbol de patrones (MSW)}}
+En este capítulo se presenta el algoritmo MSW (sección \ref{sec:algoritmo_MSW}) y una implementación del mismo en C++ (sección \ref{sec:Implementacion}). El algoritmo MSW permite realizar la búsqueda de múltiples patrones sobre un texto, basándose para ello en la construcción de una máquina de estados (\textbf{FSM}) que es creada a partir de una estructura arborescente (la cual representa todos los patrones) definida en la sub sección \ref{subsec:gct}. Resulta necesario introducir un conjunto de definiciones para presentar el algoritmo MSW, estas definiciones se encuentran en la sección \ref{section:def_prev}.
+%Definiciones previas?
+\section{Definiciones previas}
+\label{section:def_prev}
+En esta sección se presenta un conjunto de definiciones que serán utilizadas para describir el algoritmo MSW.
+En esta sección se presenta un conjunto de definiciones que serán utilizadas para describir el algoritmo MSW.
+\subsection{Árbol GCT}
+\label{subsec:gct}
+Diremos que un árbol $\mathcal{T}$, con raíz,  es un {\it General Context Tree} (\textbf{GCT}) si cumple las siguientes propiedades \cite{MSW04}:
+\begin{itemize}
+\item Cada arista está etiquetada por una secuencia de símbolos pertenecientes a {\it $A^{+}$}, siendo {\it $A^{+}$} el conjunto de secuencias de símbolos del alfabeto {\it A} de largo positivo.
+\item Cada nodo puede tener hasta $\mid A \mid$ aristas salientes.
+\item Cada nodo es etiquetado mediante una secuencia finita de caracteres resultante de concatenar las etiquetas de las aristas del camino que une a la raíz con el nodo. El nodo raíz es etiquetado con 0. Identificamos los nodos con sus etiquetas y así decimos, por ejemplo, que un nodo es prefijo de otro para indicar que sus etiquetas satisfacen esa condición.
+\end{itemize}
+La estructura GCT, o estructuras que comparten propiedades similares también se conocen con el nombre de árbol PATRICIA \cite{PAT}. Cabe observar que un {\it Trie} (definido en el capítulo \ref{Chapter2}) es un caso particular de GCT, donde todas las etiquetas de las aristas son de largo 1.
+\begin{example*}
+En la figura \ref{fig:gct} se presenta un árbol GCT construido sobre el alfabeto \{a, c, g, t \}.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[every tree node/.style={draw,circle},fill=blue!20,
+   level distance=1.75cm,sibling distance=0.8cm, 
+   edge from parent path={(\tikzparentnode) -- (\tikzchildnode)}]
+\Tree [.\node[fill=blue!20] {}; 
+	\edge node[left] {ag};  
+    [.\node[fill=blue!20] {}; 
+      \edge node[left] {gt};  
+      [.\node[fill=blue!20] {};  ]
+      \edge node[right] {c};
+       [.\node[fill=blue!20] {}; ]
+    ]
+    \edge node[left] {gc};
+    [.\node[fill=blue!20] {};]
+    \edge node[right] {ccc};
+    [.\node[fill=blue!20] {};]
+    ];
+\end{tikzpicture}
+\caption[Ejemplo: GCT]{GCT construido sobre el alfabeto \{a, c, g, t \}}
+	\label{fig:gct}
+\end{figure}
+\end{example*}
+\myrule{}{}
+\subsection{Descomposición canónica}
+\label{subsec:desc_canonica}
+En esta subsección definimos la \emph{descomposición canónica}, su implementación y uso dentro del algoritmo MSW serán abordados en el capítulo \ref{sec:algoritmo_MSW}.\\
+Diremos que una secuencia {\it w} es una \emph{palabra} de $\mathcal{T}$ si es prefijo de un nodo de $\mathcal{T}$.\\
+%Diremos que un estado {\it s} $\in$ {\it T} ({\it T} un árbol GCT) es un {\bf estado permanente} de {\it T} si y solo si $deg(s) < \alpha$ \footnote{{\it deg(s)} representa el número de aristas salientes del estado {\it s}} o {\it s} tiene una arista compuesta.
+Dada una secuencia de caracteres {\it y} $\in$ {\it $A^{*}$}, donde {\it $A^{*}$} es el conjunto finito de secuencias de símbolos del alfabeto {\it A}, definimos la descomposición canónica {\it $C_{\mathcal{T}}$(y)} =  $\langle$ r, u, v $\rangle$, r, u, v $\in$ {\it $A^{*}$}, donde  $y = ruv$, $r$ es el prefijo más largo de {\it y} que es nodo de $\mathcal{T}$ y $ru$ es el prefijo más largo de {\it y} que es palabra de $\mathcal{T}$. 
+\begin{example*}
+Tomando como $\mathcal{T}$ el árbol de la figura \ref{fig:gct}, tenemos que {\it $C_{\mathcal{T}}$(aggc)} = $\langle$ ag, g, c $\rangle$.\\
+\end{example*}
+\myrule{}{}
+\subsection{Árbol $\mathcal{T}_{suf}$}
+Dado un GCT, $\mathcal{T}$, definimos $\mathcal{T}_{suf}$ como el GCT que se obtiene a partir de $\mathcal{T}$ agregando como nodos todos los sufijos de los nodos.
+\begin{example*}
+Partiendo del árbol de la figura \ref{fig:gct}, se construye el árbol $\mathcal{T}_{suf}$ presentado en la figura \ref{fig:tsuf}.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[every tree node/.style={draw,circle},fill=blue!20,
+   level distance=1.75cm,sibling distance=0.8cm, 
+   edge from parent path={(\tikzparentnode) -- (\tikzchildnode)}]
+\Tree [.\node[fill=blue!20] {}; 
+	\edge node[left] {ag};  
+    [.\node[fill=blue!20] {}; 
+      \edge node[left] {gt};  
+      [.\node[fill=blue!20] {};  ]
+      \edge node[right] {c};
+       [.\node[fill=blue!20] {}; ]
+    ]
+    \edge node[right] {g};
+    [.\node[fill=blue!20] {};
+	  \edge node[left] {t};
+      [.\node[fill=blue!20] {};] 
+      \edge node[right] {c};
+      [.\node[fill=blue!20] {}; ]
+      \edge node[right] {gt};
+       [.\node[fill=blue!20] {}; ]
+    ] 
+    \edge node[right] {c};
+    [.\node[fill=blue!20] {};
+	  \edge node[right] {c};
+      [.\node[fill=blue!20] {};
+		\edge node[right] {c};
+      	[.\node[fill=blue!20] {};]
+      ]
+    ]
+	\edge node[right] {t};
+    [.\node[fill=blue!20] {};
+	]    
+    ];
+\end{tikzpicture}
+\caption[Ejemplo: $\mathcal{T}_{suf}$]{$\mathcal{T}_{suf}$ construido a partir del árbol de la figura \ref{fig:gct}}
+	\label{fig:tsuf}
+\end{figure}
+\end{example*}
+\myrule{}{}
+\subsection{Clausura FSM sobre un árbol $\mathcal{T}$}
+\label{subsec:clausura_FSM}
+%comienza guia de Alvaro
+Los GCT se usan en \cite{MSW04} como un mecanismo de selección de estados para asignar una probabilidad al siguiente carácter de un texto condicionado en los anteriores, de forma similar al uso de máquinas de estado finitas en modelos Markovianos. Específicamente, el \emph{estado} seleccionado por $T[1,i]$ en un GCT $\mathcal{T}$ es el nodo $r$ de la descomposición canónica $C_{\mathcal{T}}$(y)} =  $\langle$ r, u, v $\rangle$, donde $y=T[i]T[i-1]...T[1]$ es el reverso de $T[1,i]$.\\
+El algoritmo de búsqueda de patrones que presentamos en este capítulo construye un GCT a partir de un conjunto de patrones $P=\{p_{1}..p_{k}\}$ y utiliza este mecanismo de selección de estados para identificar ocurrencias de patrones en el texto. Concretamente, a partir de un GCT que contiene sólo la raíz se construye $\mathcal{T}$ agregando, de forma secuencial, los nodos correspondientes a $\overline{p_{1}}, \overline{p_{2}}, ..., \overline{p_{k}}$, donde $\overline{p_{j}}$ es el reverso de $p_{j}$. La inserción de $\overline{p_{j}}$ en $\mathcal{T}$ con descomposición canónica $C_{\mathcal{T}}(\overline{p_{j}}) = \langle r, u, v \rangle$ implica la creación de un nodo $ruv$ y la potencial creación de un nodo $ru$ si $v \not= 0$. En este último caso, el estado $ru$ no representa ningún patrón de P, sino que se crea para satisfacer requerimientos estructurales de los GCT. En este GCT, cada vez que un patrón $p_{j}$ ocurre en el texto, digamos como sufijo de $T[1,i]$, para algún $i$, $\mid p_{j} \mid \leq i \leq \mid T \mid$, el estado seleccionado por $T[1,i]$ será el que representa a $\overline{p_{j}}$. El algoritmo de búsqueda de patrones consistirá entonces en determinar el estado seleccionado por $T[1,i]$ para todo $i$, $1 \leq i \leq \mid T \mid$, y almacenar las veces que cada estado se selecciona. Al final de este proceso la cantidad de ocurrencias de un patrón $p_{j}$ será la suma de la cantidad de ocurrencias de los estados de los cuales $\overline{p_{j}}$ es prefijo.\\
+%finaliza guia de Alvaro
+Con el objetivo de que este algoritmo ejecute en tiempo lineal en n, usaremos un mecanismo para determinar el estado seleccionado por $T[1,i+1]$ en función del seleccionado por $T[1,i]$ en tiempo $O(1)$. El mecanismo que hace posible esta operativa es la \emph{clausura FSM de $\mathcal{T}$}, dicho concepto es presentado a continuación\\ 
+Consideramos un árbol $\mathcal{T}$, un alfabeto {\it A} y $S$ el conjunto de nodos de $\mathcal{T}_{suf}$: definimos la función $ transition\colon S \times A\to S$ tal que  $transition(s,a)$ es el estado seleccionado por $sa$ en $\mathcal{T}_{suf}$.\\
+Definimos \emph{clausura FSM} de $\mathcal{T}$ como la máquina de estados que tiene como conjunto de estados los nodos de $\mathcal{T}_{suf}$ y como función de siguiente estado a $transition$.\\
+El algoritmo de construcción de la clausura FSM será abordado en la sección \ref{sec:algoritmo_MSW}. En el siguiente ejemplo se muestra como es utilizada esta estructura para buscar patrones en un texto.
+\begin{example*}
+Sea $P$ un conjunto de patrones tal que $P$ = $\{cg, cgta, ta\}$, un alfabeto \{a, c, g, t\} y un texto $T=gacgcgtata$. El algoritmo presentado en este capítulo comienza insertando los patrones invertidos, es decir $\overline{P}=\{gc, atgc, at\}$, en un $\mathcal{T}$ GCT. Luego, se genera a partir de esta estructura la clausura FSM.
+Finalmente, utilizando la clausura FSM, se seleccionan estados para cada caracter del texto como se expuso anteriormente. Una vez se finalice el procesamiento del texto se tendrá la cantidad de veces que se seleccionó cada nodo. En una etapa de post procesamiento, usando esta información almacenada en los nodos, se calcula la cantidad de ocurrencias de cada patrón.\\
+En la figura \ref{fig:clausura_fsm} se presenta la clausura FSM asociada a $\overline{P}$. El nodo 1 representa una ocurrencia del patrón $ta$, el 3 una ocurrencia de $cg$ y el 5 una ocurrencia de $cgta$. Las aristas punteadas representan aristas del GCT, mientras que las restantes representan transiciones dentro de la clausura FSM. Por motivos de claridad sólo fueron dibujadas las aristas de transición que son atravesadas al momento de recorrer el texto de este ejemplo.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture} [->,>=stealth',scale=1,auto,node distance=6.0cm]
+  \tikzstyle{every state}=[fill=blue!20,draw=none,text=white]
+
+  \node[state]		   (A)                    {0};
+  \node[state]         (B) [below left of=A] {1};
+  \node[state]         (E) [below right of=A] {4};
+  \node[state]         (C)  at ($(B)!0.25!(E)$) {2};
+  \node[state]         (D)  at ($(B)!0.75!(E)$) {3};
+  \node[state]         (F) [below of=B] {5};
+  \node[state]         (G) [below of=E] {6};	    
+  
+  \path (A) edge [dashed]             node [left] {at} (B)
+            edge 		             node {c} (C)
+            edge	 [dashed]			 node[left] {gc} (D)
+            edge	 					 node[left] {t} (E)
+		    edge [loop above] node {a,g} (A)
+		(B) 
+			edge [bend left=10]	node {c} (C)
+			edge [bend left=30]	node {t} (E)
+			edge [dashed]		node {gc} (F)
+		(C) edge [bend left=30]	node {g} (D)
+		(D) edge [bend right=10]	node {c} (C)
+			edge 				node [above] {t} (G)	
+		(E) edge [dashed]		node {gc} (G)
+			edge  [bend left=20] node {a} (B)					
+		(F) edge  				 node {t} (E)					
+		(G)	edge [bend left=20]	node {a} (F);
+
+\end{tikzpicture}
+\caption[Ejemplo: Clausura FSM]{{\it Clausura FSM parcial sobre $\mathcal{T}$}}
+	\label{fig:clausura_fsm}
+\end{figure}
+El algoritmo de búsqueda comienza seleccionando el nodo raíz, luego, para cada caracter de $T$, la función $transition$ retorna el nuevo nodo a ser seleccionado. La figura \ref{fig:fsm_state_matrix} muestra el estado seleccionado para cada carácter de $T$. 
+\begin{center}
+\begin{figure} [H]
+\centering
+$\begin{matrix}
+g& a & c & g & c & g & t & a & t & a\\
+0 & 0 & 2 & 3 & 2 & 3 & 6 & 5 & 4 & 1 \\
+\end{matrix}$
+	\caption[Ejemplo del algoritmo KMP]{Ejemplo del algoritmo KMP}
+	\label{fig:fsm_state_matrix}
+\end{figure}
+\end{center}
+En la figura \ref{fig:fsm_state_matrix} observamos que se selecciona una vez el nodo 5, por otro lado dicho nodo no tiene descendencia, por lo que tenemos una sola ocurrencia de $cgta$ en el texto. Con idéntico razonamiento se tiene que el patrón $cg$ se encuentra dos veces en el texto. Observamos que el patrón $ta$ es sufijo de $cgta$, en este caso no alcanzará solo con sumar las veces que se seleccionó el nodo 1, sino que se debe sumar también las visitas que recibió el nodo 5 (descendiente de 1). Teniendo en cuenta lo dicho, se tienen 2 ocurrencias del patrón $ta$ en el texto.
+\end{example*}
+\myrule{}{}
+
+\section{Algoritmo}
+\label{sec:algoritmo_MSW}
+El algoritmo MSW se divide en tres etapas, la primera etapa construye la clausura FSM del GCT asociado a un conjunto de patrones, la segunda realiza el procesamiento del texto y la tercera etapa (post procesamiento) genera un informe que indica la cantidad de apariciones de cada patrón en el texto.
+En esta sección se explica cada una de estas etapas.
+\subsection{Algoritmo de construcción de la clausura FSM}
+\label{subsec:makeFSM}
+La etapa de construcción comienza con la inserción de un conjunto de patrones \emph{P} sobre un árbol $\mathcal{T}$ GCT. Luego, se ejecuta el procedimiento $MakeFSM(\mathcal{T})$ \cite{MSW04}, presentado en el algoritmo \ref{Algorithm:makeFSM}, el cual crea $\mathcal{T}_{suf}$ y la clausura FSM simultáneamente. Los procedimientos definidos en esta sección utilizan estructuras de datos auxiliares, estas son:
+\begin{itemize}
+\item \emph{Tail[w]}: Dado un nodo {\it w} de $\mathcal{T}$, \emph{Tail[w]} es un puntero a un nodo $v$ que cumple que $L(v) = tail(L(w))$, donde $tail(x)$ denota el sufijo de largo $\mid x \mid - 1$ de una secuencia de caracteres $x$ (o $\lambda$ si $x = \lambda$). Notaremos con $sTail(x)$ al nodo que representa a $tail(x)$ en el árbol.
+\item \emph{Traversed[w, a]}: Dado un nodo {\it w} de $\mathcal{T}$ y un símbolo {\it a} del alfabeto {\it A}, este vector contiene {\it true} si y solo si el algoritmo recorrió el nodo descendiente de {\it w} en la dirección de {\it a}. Este vector se inicializa en {\it false} para todos los símbolos y nodos.
+\item \emph{Transitions[w]}: Representa la función $transition$ de un nodo {\it w} de $\mathcal{T}$.
+\item \emph{Children[w]}: Dado un nodo {\it w} de $\mathcal{T}$ retorna todos los nodos descendientes de {\it w}.
+\end{itemize}
+Llamaremos $\mathcal{T}'$ a la estructura de datos parcialmente construida. Como puede apreciarse la rutina $MakeFSM(\mathcal{T})$ (algoritmo \ref{Algorithm:makeFSM}) invoca en la línea 1 al procedimiento $Verify(\mathcal{T}'[0])$  y en la línea 2 al procedimiento {\it PropagateTransitions((\{(a,$\mathcal{T}'[0]$) / a $\in$ A\}, $\mathcal{T}'[0]$))}, los algoritmos de estos procedimientos son presentados en \ref{Algorithm:verify} y \ref{Algorithm:PropagateTransitions} respectivamente.\\
+\begin{algorithm}[h]
+\small
+\caption{Procedimiento $MakeFSM(\mathcal{T}')$}
+\label{Algorithm:makeFSM}
+\begin{algorithmic}[1]
+\State $Verify(\mathcal{T}'[0])$
+\State $PropagateTransitions((\{(a,\mathcal{T}'[0]) / a \in A\}, \mathcal{T}'[0]))$
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+\begin{algorithm}[h]
+\small
+\caption{Procedimiento $Verify(w)$}
+\label{Algorithm:verify}
+\begin{algorithmic}[1]
+\State $c \gets head(w)$
+\State $x \gets tail(w)$
+\State $\langle r, u, v \rangle \gets C_{\mathcal{T}'}(x)$
+\If {$u \not= 0$ $or$ $v \not= 0$}
+	\State $Insert(r, u, v)$
+	\If {$u \not= 0$}
+		\If {$Traversed[r, head(u)]$}
+			$Verify(ru)$
+		\EndIf	
+	\Else
+		\If {$v \not= 0$ $and$ $Traversed[r, head(v)]$}
+			$Verify(rv)$
+		\EndIf		
+	\EndIf	
+\EndIf
+\State $Tail[x] \gets sTail(x)$
+\State $Transitions[x](c) \gets w$
+\ForAll {$a \in A$}
+	\If {$not(Traversed[w, a])$}
+		\State $Traversed[w, a] \gets true$
+		\If {$w$ tiene una arista $az$ en la dirección de $a$}
+			\State $Verify(waz)$
+		\EndIf					
+	\EndIf		
+\EndFor
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+\begin{algorithm}[h]
+\small
+\caption{Procedimiento $Insert(r,u,v)$}
+\label{Algorithm:Insert}
+\begin{algorithmic}[1]
+\If {$u == 0$}
+	\State Agregar $r\overset{v}{\rightarrow}rv$
+\Else
+	\State Dividir $r\overset{uy}{\rightarrow}ruy$ en $r\overset{u}{\rightarrow}ru\overset{y}{\rightarrow}ruy$
+	\State $Traversed[ru, head(y)] \gets Traversed[r,head(u)]$
+	\If {$v \not= 0$}
+		\State $Add(ruv, \mathcal{T}')$
+	\EndIf	
+\EndIf
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+
+\begin{algorithm}[h]
+\small
+\caption{Procedimiento $PropagateTransitions(F, w)$}
+\label{Algorithm:PropagateTransitions}
+\begin{algorithmic}[1]
+\ForAll {$a \in A$} 
+	\If {$Transitions[w](a) == \emptyset$}
+		\State $Transitions[w](a) \gets F(a)$
+	\EndIf
+\EndFor
+\ForAll {$v \in Children[w]$} 
+	\State $PropagateTransitions(Transitions[w], v)$
+\EndFor
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm} 
+El procedimiento $Verify(w)$ recibe un nodo {\it w} de {\it $\mathcal{T}'$} y verifica si el nodo $sTail(w)$ se encuentra en {\it $\mathcal{T}'$}, agregandólo a la estructura de ser necesario. También define las transiciones de la forma $transition(s,a)$=$as$. En la línea 1 y 2 del procedimiento $Verify$ se obtiene el primer carácter de la secuencia $L(w)$ (denotado $head(w)$) y el sufijo $tail(w)$. Luego, en la línea 3 se realiza la descomposición canónica (definida en \ref{subsec:desc_canonica}). En las líneas 4 y 5, si $u$ o $v$ no son la raíz, se invoca al procedimiento de inserción de los nodos obtenidos en la descomposición canónica. Entre las líneas 6 y 12 se analiza si es necesario invocar recursivamente el nodo. Será necesario hacer la recursión cuando se creen nuevos nodos y el algoritmo no se haya ejecutado en la dirección del nodo recientemente creado. En la línea 14 se asigna el puntero \emph{tail} con el nodo obtenido de \emph{sTail(x)}. Cabe aclarar que el algoritmo asegura la existencia de este nodo (\emph{sTail(x)}) al momento de realizar la asignación de la línea 14, ya que tanto el nodo $ru$ como $ruv$ se crean en caso de que $u$ y/o $v$ no sean el nodos raíz.\\
+En la línea 15 se asignan las transiciones de la forma $transition(sTail(x),c)$=$csTail(x)$ tal como se definió en la sub sección \ref{subsec:clausura_FSM}. Entre las líneas 16 y 23 se ejecutan llamadas recursivas de los nodos hijos que aún no se han procesado. Este algoritmo asegura que todos los nodos de la estructura son procesados una única vez.\\
+El procedimiento $Insert(r, u, v)$ inserta el nodo $v$ en $\mathcal{T}'$ si $u$ es el nodo raíz (línea 1 y 2).
+En caso contrario (líneas 4 y 5) divide el nodo $ruy$ en dos nodos, $ru$ y $ruy$, y asigna el vector \emph{traversed} al nodo recientemente creado en la división ($ru$). Finalmente, en caso de que el nodo $v$ no sea el raíz, se agrega el nodo $ruv$ en $\mathcal{T}'$.\\
+Las transiciones de la forma $transition(s,a)= u \prec as$ se generan en el procedimiento $PropagateTransitions$. Este procedimiento toma como entrada un conjunto de transiciones {\it F} y un nodo {\it w} de $\mathcal{T}$. En el algoritmo presentado, este procedimiento sólo se invoca desde $MakeFSM$. El conjunto {\it F} pasado como parámetro es un conjunto que hace corresponder los símbolos de {\it A} con el nodo {\it 0}, mientras que el nodo {\it w} es la raíz de $\mathcal{T}'$. Las líneas 1 a 5 de este procedimiento asignan las transiciones de la forma mencionada anteriormente, mientras que en el ciclo que se encuentra entre las líneas 6 y 8 se invocan recursivamente los nodos hijos con el conjunto de transiciones del nodo actual. Cuando finaliza este procedimiento se tiene la definición completa de la función $transition$ en la estructura.\\
+Se observa que calcular el nodo $sTail(w)$ puede ser computacionalmente costoso ya que una implementación que recorra la estructura del árbol desde la raíz tendría que consumir $\mid w \mid - 1$  símbolos. Sin embargo, en este algoritmo fue previsto un puntero al nodo {\it tail}, con lo cuál, si en un nodo $v$ el algoritmo ya obtuvo el nodo {\it tail} que le corresponde, un nodo $u \prec v$ podrá utilizar esta información para acelerar el cálculo.\\ 
+Por otro lado las etiquetas de cada arista son sub secuencias de los patrones, por este motivo las mismas pueden ser representadas mediante un par de punteros a los patrones. De esta forma no es necesario mantener más información en la memoria.\\ 
+La estructura $tail$ también se utiliza para realizar eficientemente la descomposión canónica. El procedimiento $Verify$ asegura que, salvo cuando se invocan los nodos descendientes de la raíz desde el ciclo de la línea 16, en cada invocación a $Verify(w)$ se tiene que $w$ es de la forma $w=auv$, siendo el nodo padre de w ($au$) distinto del nodo raíz; además se sabe que dicho nodo fue procesado por $Verify$ anteriormente. Por este motivo, se puede procesar $C_{\mathcal{T}'}(uv)$ partiendo desde el nodo $u$, leyendo los símbolos de $v$ y atravesando el árbol hasta que se encuentre el primer prefijo de $uv$ que no es palabra de $\mathcal{T}'$. De esta forma el número de operaciones necesarias es proporcional a $\mid v \mid$ en vez de a $\mid uv \mid$.\\ 
+Cuando $Verify(ru)$ es invocado desde la línea 7, se tiene que $sTail(ruy)$ es un nodo de $\mathcal{T}'$ y $tail(ru)$ es una palabra de $\mathcal{T}'$ . En estas condiciones podemos hallar $tail(ru)$ en la estructura partiendo de $sTail(r)$ (el cual ya está calculado), atravesando las aristas en la dirección de $u$, comparando solo el primer carácter de cada arista para determinar la dirección del siguiente nodo. Consecuentemente, cada vez que se atraviesa una arista, se avanza tantos símbolos como largo tenga dicha arista pero solo se compara uno. En este caso se tiene entonces que el costo computacional es proporcional al número de nodos que se encuentren en el camino desde $sTail(r)$ a $sTail(r)u$, en vez de ser $\mid u \mid$. Esta optimización la llamaremos \emph{modo rápido} ({\it fast mode}).
+\section{Procesamiento y post procesamiento de texto utilizando la clausura FSM}
+\label{sec:Procesamiento_FSM}
+En esta sección se presenta el algoritmo MSW completo y se detallan las etapa de procesamiento y post procesamiento.
+El algoritmo \ref{Algorithm:msw} muestra las diversas etapas de este algoritmo, las mismas son explicadas a continuación.\\
+\begin{algorithm}[h]
+\small
+\caption{Algoritmo MSW}
+\label{Algorithm:msw}
+\begin{algorithmic}[1]
+\State $CreateEmptyGCT(\mathcal{T})$
+\ForAll {$p_{i} \in P$}
+	\State $patternsNode[i] \gets Insert(\mathcal{T}, inv(p_{i}))$
+\EndFor
+\State $FSM \gets MakeFSM(\mathcal{T})$
+\State $currentNode = FSM[0]$
+\ForAll {$a_{i} \in $ T}
+	\State $currentNode \gets transitions[currentNode](a_{i})$
+	\State $IncVisit(currentNode)$
+\EndFor
+\ForAll {$finalNode \in patternsNode$}
+	\State $print(CountMatches(finalNode),finalNode)$
+\EndFor
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+En la línea 1 se crea un árbol GCT vacío sobre el cual se insertarán los patrones y se construirá la clausura FSM.
+El ciclo comprendido en las líneas 2 a 4 realiza la inserción de cada uno de los patrones en la estructura arborescente inicial. Los patrones son invertidos antes de ser insertados. En la implementación presentada no se invierten los patrones ya que los patrones que se cargan en la estructura ya se encuentran invertidos, es decir, se invierten utilizando un script de bash antes de llamar al programa \emph{PDG}. De esa forma no se tiene en cuenta el costo de inversión a la hora de tomar medidas experimentales.\\
+La línea 5 invoca al procedimiento de creación de la clausura FSM visto en la sub sección \ref{subsec:makeFSM}. \\
+Entre las líneas 6 y 9 el algoritmo coloca un puntero \emph{actual} al estado inicial (estado 0) y recorre el texto secuencialmente carácter a carácter. Cada carácter leído actualiza el puntero al nodo \emph{actual}, invocando para ello a $transition$ con el carácter leído y el nodo \emph{actual}. Además de dicha actualización este algoritmo deja registro de la visita a dicho nodo incrementando un contador de visitas.\\
+En el ciclo comprendido entre las líneas 11 y 13 se realiza el post procesamiento el cual se define mediante el procedimiento $CountMatches(finalNode)$. Este procedimiento toma como entrada un nodo final (es decir un nodo que representa el hecho de haber encontrado al menos un patrón), y recorre en profundidad el sub árbol que tiene como raíz dicho nodo final. En esta recorrida se suman las visitas de los descendientes del nodo final, este resultado es asignado a dicho nodo. 
+Cabe observar que el post procesamiento es necesario para los casos que existan patrones (no invertidos) que sean sufijos de otros.\\
+La fase de post procesamiento se puede mejorar si se re utilizan las recorridas de sub árboles, es decir un mismo sub árbol no se recorre dos veces en el ciclo de las líneas 11 a 13.\\
+Finalmente los nodos finales contienen la cantidad de apariciones de cada patrón en el texto procesado. 
+\section{Implementación}
+\label{sec:Implementacion}
+En esta sección se presenta una implementación del algoritmo de construcción de la clausura FSM partiendo de un conjunto de patrones {\it P} y su posterior uso en el procesamiento de un texto.\\
+\subsection{Creación de la clausura FSM}
+\label{subsec:implfsm}
+Cada nodo de la estructura del algoritmo MSW se especifica en la clase {\it MSWNode}, el código que se muestra en \ref{lst:codigo_estructura_MSW} presenta dicha definición.
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+\begin{lstlisting}[caption=Representación de los nodos en MSW, label={lst:codigo_estructura_MSW}]
+    char head;
+    const char* subsequence;
+    Uint subsequenceLength;
+    bool traversed [ALPHABET_SIZE];
+    MSWNode *children [ALPHABET_SIZE];
+    MSWNode* transitions [ALPHABET_SIZE];
+    MSWNode *father;
+    MSWNode *tail;
+    Uint count;
+\end{lstlisting}
+Dentro de la estructura presentada, se tienen atributos que sólo son necesarios al momento de la fase de construcción, estos son {\it head}, {\it traversed}, {\it subsequence}, {\it subsequenceLength}, {\it father} y {\it tail}. Esta información podría ser removida una vez finalice la fase de construcción, sin embargo, esta fase de eliminación no fue realizada en este proyecto.\\ 
+Cada patrón insertado en la estructura es representado por una única cadena de caracteres, cada nodo apunta hacia la posición de dicha cadena según corresponda. Es decir, solo se mantiene en memoria una secuencia de caracteres por cada patrón y cada nodo contiene una sub cadena de algún patrón. Esta sub cadena se representa mediante el puntero {\it subsequence} (el cuál apunta al inicio de la subsecuencia que el nodo representa) y {\it subsequenceLength} que representa el largo de la sub secuencia.\\
+Los arreglos {\it transversed}, {\it transitions} representan los vectores {\it Transversed} y {\it Transitions} presentados en la sección \ref{subsec:makeFSM}; mientras que, el arreglo {\it children} matiene en memoria los descendientes de cada nodo. Estos tres arreglos también podrían ser representados, como se muestra en \ref{lst:merged_structure}. Con esta nueva representación se busca reducir los fallos de memoria caché (ver la sub sección \ref{subsec:falloscache} del capítulo \ref{Chapter4}). Sin embargo, pruebas realizadas mostraron que ese cambio en la estructura no repercute en mejorar los fallos en memoria caché y por lo tanto no mejoraba los tiempos de ejecución. Por dicho motivo, esta representación alternativa se descartó.\\
+\begin{lstlisting}[caption=Representación de los nodos en MSW, label={lst:merged_structure}]
+   struct MergedStruct {
+        bool traversed;
+        MSWNode *child;
+        MSWNode* transition;
+    };
+    MergedStruct *data [ALPHABET_SIZE];
+\end{lstlisting}
+El carácter {\it head} representa, para cada nodo el carácter cabezal de la tira; es decir representa el primer carácter que se encuentra en el camino definido por el nodo raíz y el nodo actual.\\
+El puntero {\it father} representa el ancestro de un nodo, este puntero es utilizado por el procedimiento $Verify$ para acceder a ejecutar de forma eficiente la descomposición canónica. Por otro lado, el procedimiento  $MakeFSM$, requiere que todo nodo que se encuentre en GCT tenga asociado un nodo {\it tail}, esta realación queda representada por el puntero {\it tail}.\\
+El entero {\it count} es utilizado para contabilizar la cantidad de accesos que un nodo tiene cuando se procesa el texto. Este contador es usado luego en el post procesamiento para obtener el informe final.\\
+La clase \emph{MSWGraph} representa la estructura de clausura FSM y todas las estructuras intermedias de la misma (desde el árbol GCT a la estructura final), también alberga los procedimientos definidos en la sección \ref{sec:Implementacion}. En ella se define la estructura presentada en \ref{lst:mswstructure}.
+\begin{lstlisting}[caption=Representación de la máquina de estados, label={lst:mswstructure}]
+    bool fastMode;
+    MSWNode *root;
+    MSWNode *currentPosition;
+\end{lstlisting}
+La variable {\it fastMode} representa si la descomposición canónica debe ejecutarse en modo rápido o no. Esta variable solo es útil en la fase de construcción del algoritmo, sin embargo no se remueve la misma una vez se finaliza dicha etapa. El puntero {\it root} apunta al nodo raíz del árbol GCT. El nodo raíz se inicializa como se muestra en el código \ref{lst:rootInit}. 
+\begin{lstlisting}[caption=Inicialización del nodo raíz (realizada en MSWNode), label={lst:rootInit}]
+subsequence = NULL;
+subsequenceLength = 0;
+father = this;
+//Por motivos de implementacion el tail del root debe ser el mismo root
+tail = this;
+for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE; alphabetIndex++) {
+	transitions[alphabetIndex] = NULL;
+	traversed[alphabetIndex] = false;
+}
+\end{lstlisting}
+Puede apreciarse que el nodo raíz define su puntero {\it tail} como la misma raíz. Además el nodo raíz es el único que tiene {\it subsequence} nula. 
+Una vez construida la clausura FSM este nodo representará el estado inicial de la máquina de estados. \\
+El puntero {\it currentPosition} indica la posición actual dentro de la máquina de estados. Este puntero se utiliza en la etapa de procesamiento del texto.\\
+Las líneas 1 a 4 del algoritmo \ref{Algorithm:msw} crean un árbol $\mathcal{T}$ GCT vacío e insertan uno a uno los patrones. En la implementación de este proyecto la creación de $\mathcal{T}$ es realizada en \emph{Main}. En este módulo se insertan cada uno de los patrones, invocando para ello al procedimiento $addPattern$ de la clase \emph{MSWGraph}. Este procedimiento toma como parámetros de entrada un patrón \emph{p} y su largo, insertando al mismo en la estructura GCT y retorna un nodo $w$ tal que $L(w) = p$. El nodo retornado es agregado en el vector {\it patternsNodes} para el futuro post procesamiento.\\
+El procedimiento $MakeFSM$ se implmentó como se presenta en el código \ref{lst:makefsm}.
+\begin{lstlisting}[caption=Procedimiento $MakeFSM$, label={lst:makefsm}]
+void MSWGraph::MakeFSM() {
+	for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE;
+	 alphabetIndex++) {
+		root->traversed[alphabetIndex] = true;
+		if (root->children[alphabetIndex]) {
+			fastMode = false;
+			Verify(root->children[alphabetIndex]);
+		}
+	}
+	MSWNode *aux = root;
+	MSWNode *F[ALPHABET_SIZE];
+	for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE;
+	alphabetIndex++) {
+		F[alphabetIndex] = root;
+	}
+	PropagateTransitions(root, F);
+	root = aux;
+}
+\end{lstlisting}
+En este código puede apreciarse que se sigue la definición dada anteriormente de $makeFSM$, con la única diferencia que se inicializa la variable {\it fastMode}.\\
+El procedimiento $Verify(w)$ sigue los lineamientos dados por el algoritmo \ref{Algorithm:verify}. 
+La variable local {\it currentNodeWordIndex} se inicializa en 1 o 0 dependiendo si $w$ es o no el nodo raíz. En caso de no ser el nodo raíz se inicializa en 1 por que se conoce de ante mano que el primer carácter ({it head}) ya fue procesado .\\ 
+Dependiendo del valor de la bandera {\it fastMode} $Verify$ invoca a una de las dos modalidades de cálculo de la descomposición canónica. El código \ref{lst:verify} muestra la implementación del procedimiento $Verify$.
+\begin{lstlisting}[caption=Descomposición canónica - definiciones, label={lst:verify}]
+	Uint nodeLength = w->subsequenceLength;
+	MSWNode *rnode = w->father->tail;
+	Uint currentNodeWordIndex;
+	!w->father->subsequence ? currentNodeWordIndex = 1 
+	: currentNodeWordIndex = 0;
+	MSWNode *vnode = NULL;
+	MSWNode *unode = NULL;
+	MSWNode *xTail;
+	if (fastMode) {
+		fastDescomposition(xTail, rnode, unode, vnode);		
+	} else {
+		normalDescomposition(xTail, rnode, unode, vnode);			
+	}
+	if (unode || vnode) {
+		FSMInsert(rnode, unode, vnode);
+		if (unode) {
+			if (rnode->traversed[ordChar[(int)unode->subsequence[0]]]) {
+				fastMode = true;
+				Verify(unode);
+			}
+		}
+		else {
+			//vnode no es necesario preguntar
+			if (rnode->traversed[ordChar[(int)vnode->subsequence[0]]]) {
+				fastMode = false;
+				Verify(vnode);
+			}
+		}
+	}
+	else { //(!unode && !vnode)
+		//En este caso toda la palabra ya se encuentra en la estructura
+		xTail = rnode;
+	}
+	w->tail = xTail;
+	xTail->transitions[ordChar[(int)head]] = w;
+	for (int i = 0; i < ALPHABET_SIZE; i++) {
+		if (!w->traversed[i]) {
+			w->traversed[i] = true;
+			MSWNode* waz = w->children[i];
+			if (waz) {
+				fastMode = false;
+				Verify(waz);
+			}
+		}
+	}
+}
+\end{lstlisting}
+Se define un nodo inicial $r$ del cual se parte en el cálculo de la descomposición canónica. Por motivos de eficiencia las lógicas de los procedimientos {\it fastDescomposition} y {\it normalDescomposition} fueron embebidas directamente en $Verify$. Sin embargo, a efectos de que el código sea más legible en este documento se optó por separar el código en dichos procedimientos. Ambos procedimientos modifican los nodos $rnode$, $unode$, $vnode$, $xTail$ según se detalló en el algoritmo de la sub sección \ref{subsec:makeFSM}. Estas variables representan los nodos $r$, $u$, $v$ y $sTail(w)$ del algoritmo \ref{Algorithm:verify} respectivamente. \\ 
+El procedimiento $FSMInsert$ implementa al procedimiento $Insert$ presentado en la sub sección \ref{subsec:makeFSM}. Dicho procedimiento implementa todas las divisiones e inserciones definidas previamente.
+El código del procedimiento $PropagateTransitions$ se define en \ref{lst:propagateTransitions}, el mismo implementa el algoritmo  \ref{Algorithm:PropagateTransitions}.
+\begin{lstlisting}[caption=Descomposición canónica - definiciones, label={lst:propagateTransitions}]
+void MSWGraph::PropagateTransitions(MSWNode *w, MSWNode* F [ALPHABET_SIZE]) {
+	for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE; alphabetIndex++) {
+		if (!w->transitions[alphabetIndex]) {
+            w->transitions[alphabetIndex] = F[alphabetIndex];
+        }
+	}
+	for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE; alphabetIndex++) {
+		MSWNode *child = w->children[alphabetIndex];
+		if (child) {
+			PropagateTransitions(child, w->transitions);
+        }
+	}
+}
+\end{lstlisting}
+
+\subsection{Procesamiento y post procesamiento del texto}
+Luego de crear la clausura FSM se procede a realizar el procesamiento del texto, tal como se indica en el algoritmo \ref{Algorithm:msw}. \\
+La clausura FSM se actualiza con cada carácter que se procesa, esta actualización se lleva a cabo en el procedimiento {\it ScanValue} (ver código \ref{lst:scanvalue}) de la clase \emph{MSWGraph}.
+\begin{lstlisting}[caption=Procedimiento ScanValue, label={lst:scanvalue}]
+void MSWGraph::scanValue(char block[], size_t bytCount) {
+    for (Uint blockIndex = 0; blockIndex < bytCount; blockIndex++) {
+    		int index = ordChar[(int)block[blockIndex]];
+        currentPosition = currentPosition->transitions[index];
+        currentPosition->count++;
+    }
+}
+\end{lstlisting}
+En el módulo principal del programa (\emph{Main}) se realiza la apertura del archivo que contiene el texto a ser procesado. Este archivo es leído en bloques de tamaño fijo, cada uno de estos bloques es pasado como parámetro al procedimiento $scanValue$ junto con la cantidad de caracteres que contiene. El ciclo de lectura y procesamiento es el mostrado en el código \ref{lst:scanvalue}.
+\begin{lstlisting}[caption=Procesamiento del texto, label={lst:scanvalue}]
+while (!feof(sourceFile)) {
+	bytCount = fread (block, 1, sizeof(block), sourceFile);
+	fsmClosure->scanValue(block, bytCount);
+}
+\end{lstlisting}
+Una vez se termina de procesar el texto se procede a realizar el post procesamiento. Para ello se invoca desde el programa principal al procedimiento $countMatches$ (cuya implementación se presenta en el código \ref{lst:postprocedimiento}) con cada uno de los nodos del vector {\it patternsNodes}.
+ \begin{lstlisting}[caption=Post procesamiento ($countMatches$), label={lst:postprocedimiento}]
+int MSWGraph::countMatches(MSWNode *node) {
+    int patMach = node->count;
+    if (!node->tail) {
+        return patMach;
+    }
+    for (int alphabetIndex = 0; alphabetIndex < ALPHABET_SIZE; alphabetIndex++) {
+		MSWNode* child = node->children[alphabetIndex];
+		if (child) {
+			patMach+= countMatches(child);
+		}
+	}
+    node->count = patMach;
+    node->tail = NULL;
+    return patMach;
+}
+\end{lstlisting}
+El cometido de esta función fue explicado en la sección \ref{sec:Procesamiento_FSM}. Es posible acelerar el procesamiento si se persiste el resultado de la suma apariciones de cada sub árbol. Dado que al momento en que se invoca esta función todos los nodos tienen su puntero {\it tail} no nulo y este ya no es más útil, se utiliza dicho puntero para indicar si un nodo ya fue procesado asignándole {\it null} al final del procesamiento. Además la suma parcial de cada sub árbol es almacenado en la variable {\it count}. Con esta optimización el procedimiento asegura que cada nodo será procesado a lo sumo una vez.\\
+Al finalizar el post procesamiento se tiene la cantidad de apariciones de cada uno de los patrones.\\
+La estructura usada en este algoritmo es removida de la memoria cuando se finaliza la ejecución del programa.

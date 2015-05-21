@@ -1,0 +1,16 @@
+% Introduction
+
+\chapter{Introducción} % Main chapter title
+
+\label{Introduction}
+
+\lhead{Capítulo 1. \emph{Introducción}} % This is for the header on each page - perhaps a shortened title
+
+En este proyecto se aborda como tema principal la implementación y análisis experimental de algoritmos de búsqueda de múltiples patrones en un texto, poniendo especial énfasis en la aplicación de estos algoritmos en el área de bioinformática. En el capítulo \ref{Chapter1} se presenta un estudio del estado del arte de esta temática.\\
+De este estudio surgió el interés de profundizar en el algoritmo Aho Corasick (el cual abreviaremos AC), por lo que se implementó una versión de dicho algoritmo en C++ para este proyecto. Este algoritmo, junto con su implementación se presentan en el capítulo \ref{Chapter2}.\\
+Como principal objetivo de este proyecto se plantea la implementación de un algoritmo basado en una estructura de datos presentada en un artículo de Martín, Seroussi y Weinberger (el cual abreviaremos MSW) \cite{MSW04} y su comparación práctica con el algoritmo clásico de Aho Corasick \cite{AC75}. Los detalles de estos algoritmos son presentados, junto con sus implementaciones en los capítulos \ref{Chapter2} y \ref{Chapter3}.\\
+Ambos algoritmos se basan en la construcción de estructuras de datos, las mismas son construidas en una fase previa de la búsqueda.\\
+Para realizar la comparación experimental se construyó un programa principal escrito en C++ que toma como entrada un conjunto de patrones a buscar, un texto sobre el cual se realiza la búsqueda y otros parámetros de configuración. Los aspectos generales de este programa se encuentran en el apéndice \ref{AppendixB}. Luego, este programa realiza la búsqueda de los patrones sobre el texto con el algoritmo que se le indique, retornando además del resultado de la búsqueda, una serie de medidas que son analizadas y comparadas con el fin de conocer las fortalezas y debilidades de estos algoritmos.\\
+La forma en que se generan los patrones, los textos usados y la completa descripción de los experimentos efectuados y su análisis pormenorizado se encuentra en el capítulo \ref{Chapter4}.\\
+En los experimentos realizados se tuvieron en cuenta variables como el consumo de memoria principal, los fallos en la memoria caché y los tiempos de ejecución en las diversas fases de los algoritmos. Los resultados de estos experimentos muestran que para algunas configuraciones de datos de entrada el algoritmo MSW obtiene mejores tiempos de ejecución experimental que Aho Corasick y viceversa. El algoritmo MSW presenta mejores tiempos cuando el largo del texto y la cantidad de patrones a ser buscado son suficientemente grandes y el largo de cada patrón es relativamente pequeño. En los casos en que se tengan patrones  extensos o un texto corto AC presentará mejores tiempos que MSW. La caraterización precisa de las situaciones en que un algoritmo supera a otro dependen del hardware donde se ejecute, ya que este comportamiento está vinculado al aprovechamiento de la jerarquía de memoria.\\
+Como trabajo futuro se plantea mejorar las estructuras de datos con el fin de reducir el tamaño de memoria ocupada y la tasa de fallo de memoria caché. También se plantea experimentar con otros alfabetos y con otros algoritmos disponibles en la literatura.

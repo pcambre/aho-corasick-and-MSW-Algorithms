@@ -1,0 +1,264 @@
+% Chapter 2
+
+\chapter{Aho Corasick} % Main chapter title
+
+\label{Chapter2}
+
+\lhead{Capítulo 3. \emph{Aho Corasick}}
+
+En este capítulo presentamos el algoritmo conocido con el nombre de Aho Corasick (AC) \cite{AC75}. Dicho algoritmo permite encontrar ocurrencias de múltiples patrones en un texto, basándose para ello en el uso de tres funciones que pueden ser representadas mediante la construcción de un grafo. Una vez generada esta estructura de datos la misma puede utilizarse para buscar los patrones sobre un texto en una sola recorrida.\\
+Construir esta estructura demanda un tiempo de orden lineal en la suma de los largos de los patrones. Por otro lado, el tiempo que AC tarda en realizar el procesamiento del texto es de orden lineal en el largo del mismo más la cantidad total de ocurrencias de los patrones en el texto {\footnote{Observar que, si hay patrones prefijos de otros, pueden ocurrir múltiples reconocimientos de patrones en cada posición del texto}}.\\ Consideremos P, un conjunto de k patrones, cuya suma de largos (es decir la sumatoria de los largos de cada patrón perteneciente a P) es $m$, {\it T} el {\emph texto} con largo $n$ y h la cantidad de apariciones de los patrones de P en T. En estas condiciones, el tiempo de ejecución del algoritmo AC es de orden $n + m + h$. \\
+
+\section{Algoritmo}
+\label{sec:algoritmo_AC}
+El algoritmo AC se basa en la construcción de una estructura de datos que puede utilizarse como una máquina de estados finita. Cada nodo dentro de esta estructura puede considerarse un estado en la etapa de procesamiento del texto, a su vez, en cada estado el algoritmo AC puede reconocer varios patrones.\\
+Para construir esta máquina de estados, todos los patrones a ser buscados en el texto son insertados en un trie (definido en la sección \ref{sec:deftrie}). Sobre este trie, cuyos nodos serán los estados de la máquina, se representan tres funciones que definen el comportamiento del algoritmo AC. 
+\begin{itemize}
+\item Función de movimiento ({\it goto}) - Dado un estado {\it v} del trie y un símbolo {\it a} del alfabeto, retorna un estado {\it w} que es descendiente de {\it v} y la arista que los une está etiquetada con {\it a}. Si tal símbolo no existe, retorna vacío (salvo cuando $v$ es la raíz, en cuyo caso se retorna $v$).
+\item Función de fallos ({\it failure}) - Dado un estado {\it v}, esta función retorna el estado de mayor profundidad existente en la estructura, $w$, tal que $L(w)$ es sufijo de $L(v)$, donde recordamos que $L(.)$ denota la etiqueta de un nodo, definida en la sección \ref{sec:deftrie}.
+\item Función de salida ({\it output}) - Retorna el conjunto de patrones reconocidos en un estado determinado.
+\end{itemize}
+Cabe destacar que esta función de fallos es una generalización directa de la función de fallos definida en el algoritmo de KMP (sub sección \ref{subsec:kmp} del capítulo \ref{Chapter1}).\\
+Estas funciones son construidas en dos etapas, en la primera se define la función {\it goto} y se crea una primera aproximación de la función {\it output}, mientras en la segunda se construye {\it failure} y se finaliza la creación de {\it output}. Las aristas del \emph{trie} definen, para todos los nodos distintos de la raíz, a la función {\it goto}. Cada nodo del trie representa un carácter de uno o más patrones (un nodo puede ser compartido por varios patrones). Por motivos de implementación (está contemplado en \cite{AC75}) en el estado raíz, la función {\it goto} debe ser completa, es decir, para todos los símbolos del alfabeto debe retornar un estado. Dependiendo del juego de patrones, es posible que para algún símbolo no existan descendientes del nodo raíz, para estos casos la función {\it goto} retorna el nodo raíz. En los nodos que no son raíz la función {\it goto} evaluada para un símbolo {\it a} del alfabeto retorna vacío si no existe un nodo descendiente en la dirección de {\it a}. La definición de {\it goto} puede resumirse de la siguiente forma.
+\begin{itemize}
+\item {\it goto(v,a) = w} - Si una arista {\it (v,w)} está etiquetada por un símbolo {\it a}.
+\item {\it goto(0,a) = 0} - Si no existe una arista {\it (0,w)} etiquetada por el símbolo {\it a}, siendo 0 el nodo raíz del trie (utilizaremos esta notación a lo largo del capítulo).
+\item {\it goto(v,a) = $\emptyset$} - En otros casos  (siendo {\it v} un nodo diferente de 0 y {\it a} un símbolo del alfabeto).
+\end{itemize}
+\begin{example*}
+En la figura \ref{fig:goto_function} se presenta la función {\it goto} sobre el \emph{trie} del ejemplo \ref{ex:example1} presentado en el capítulo \ref{Chapter1}. Como puede observarse sólo se añade sobre el \emph{trie} un ciclo en el nodo raíz, de forma que, para todo símbolo x se tenga {\it goto(0,x)$\not= \emptyset$}. Todas las aristas del nuevo \emph{trie} representan la función {\it goto}.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture} [->,>=stealth',scale=.8,auto,node distance=2.0cm]
+  \tikzstyle{every state}=[fill=blue!20,draw=none,text=white]
+
+  \node[state]		   (A)                    {0};
+  \node[state]         (B) [below left of=A] {A};
+  \node[state]         (C) [below right of=A] {B};
+  \node[state]         (D) [below of=B] {C};
+  \node[state]         (F) [below of=D] {E};
+  \node[state]         (E) [below of=C] {D};
+  \node[state]         (G) [below left of=E] {F};
+  \node[state]         (H) [below right of=E] {G};
+  \node[state]         (I) [below of=H] {H};
+
+  \path (A) edge              node {c} (B)
+            edge              node {a} (C)
+            edge [color=red, loop above] node {g,t} (A)
+        (B) edge 			 node {g} (D)
+        (D) edge              node {g} (F)
+        (C) edge              node {c} (E)
+        (E) edge              node {g} (G)
+        		edge              node {t} (H)
+		(H) edge              node {a} (I);
+\end{tikzpicture}
+\caption[Ejemplo: Función goto]{Función {\it goto}}
+	\label{fig:goto_function}
+\end{figure}
+\end{example*}
+\myrule{}{}
+La primera fase de construcción de {\it output} se realiza al construir la función {\it goto}. En esta etapa se le asigna a los nodos cuya etiqueta coincide con un patrón, un valor que indica que dicho nodo representa el final de un patrón. 
+En la segunda etapa se procede a construir {\it failure} y finalizar la construcción de {\it output}, mediante el algoritmo de Aho  Corasick \cite{AC75} que presentamos en el algoritmo {\ref{Algorithm:failure_step2}.
+En la primera línea del algoritmo se inicializa una variable {\it queue}, que se utiliza para realizar una recorrida BFS sobre el \emph{trie}, creando así a la función {\it failure} por niveles de profundidad. La creación de {\it failure} consta de dos pasos. El primer paso se realiza en el ciclo presentado entre las líneas 2 y 6. En este se inicializa la función {\it failure} para todos los nodos del \emph{trie} con profundidad 1, de forma tal que la función {\it failure} sobre estos nodos retorne el nodo raíz ({\it failure(s) = 0}). Estos nodos son insertados en la cola {\it queue} y, de aquí en más, sólo se agregarán nodos a {\it queue} para los cuales $failure$ ya haya sido definida.
+\begin{algorithm}[h]
+\small
+\caption{Creación de la función {\it failure} y segunda fase de creación de {\it output} }
+\label{Algorithm:failure_step2}
+\begin{algorithmic}[1]
+\State $queue \gets empty$
+\ForAll {a such that {\it goto(0,a)$\not= 0$}}
+	\State $s \gets goto(0,a)$
+	\State $failure(s) \gets 0$
+	\State $queue \gets queue \cup \{s\}$	
+\EndFor
+\While {queue $\not= empty$ }
+	\State $r \gets getNext(queue)$	
+	\State $queue \gets queue - \{r\}$
+	\ForAll {a such that {\it goto(r,a) $\not= \emptyset$}}
+		\State $s \gets goto(r,a)$
+		\State $state \gets {\it failure(r)}$	
+		\While {{\it goto(state, a) = $\emptyset$}}
+			\State $state \gets {\it failure(state)}$
+		\EndWhile
+		\State ${\it failure(s)} \gets {\it goto(state,a)}$
+		\State ${\it output(s)} \gets {\it output(s)} \cup {\it output({\it failure(s)})}$
+		\State $queue \gets queue \cup \{s\}$	
+	\EndFor
+\EndWhile
+\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+La segunda etapa del algoritmo de creación de {\it failure} se realiza en el segundo ciclo (líneas 7 a 20). Este ciclo hace una recorrida BFS sobre todos los nodos del \emph{trie}, comenzando con los nodos de profundidad 1. Llamamos {\it r} al nodo que se retira de la cola {\it queue} en cada iteración. En el ciclo de la línea 10, la variable $s$ itera sobre todos los descendientes de {\it r} con etiqueta ${\it a} \in {\it A}$. En la línea 12 definimos {\it state} como el resultado de la función {\it failure(r)} (notar que $failure$ ya fue definido para $r$ porque $r$ fue sacado de la cola). El ciclo comprendido entre las líneas 13 y 15 itera aplicando la función $failure$ a $state$ sucesivamente, hasta que se alcanza un nodo tal que goto(state, a)$\not= \emptyset$. Cabe señalar que este ciclo siempre finaliza ya que {\it goto(0, a)$\not= \emptyset$ } y además la función $failure(r)$ retorna siempre un nodo de menor profundidad que $r$. La función {\it failure(s)} queda definida en la línea 16.\\
+Por otro lado, en la línea 17 se completa la construcción de la función {\it output(s)} mediante la unión de todos los patrones reconocidos en s ({\it output(s)}) y todos los patrones que sean sufijos de {\it s} ({\it output(failure(s))}). El resultado final de este algoritmo es una estructura de datos que contiene las tres funciones necesarias para buscar ocurrencias de patrones sobre un texto.
+\begin{example*}
+Agregando la función de fallos al ejemplo de la figura \ref{fig:goto_function}, representada por las aristas punteadas, se tiene que la estructura final queda como se muestra en la figura  \ref{fig:failure_function}. Consideremos el nodo F de la figura \ref{fig:failure_function}, la función de salida de este nodo debe contener tanto el patrón acg como cg, ya que el último es un sufijo del primero y ambos pertenecen al juego de patrones que se desea hallar.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture} [->,>=stealth',scale=.8,auto,node distance=2.0cm]
+  \tikzstyle{every state}=[fill=blue!20,draw=none,text=white]
+
+  \node[state]		   (A)                    {0};
+  \node[state]         (B) [below left of=A] {A};
+  \node[state]         (C) [below right of=A] {B};
+  \node[state]         (D) [below of=B] {C};
+  \node[state]         (F) [below of=D] {E};
+  \node[state]         (E) [below of=C] {D};
+  \node[state]         (G) [below left of=E] {F};
+  \node[state]         (H) [below right of=E] {G};
+  \node[state]         (I) [below of=H] {H};
+
+  \path
+  		(A) edge              node {c} (B)
+            edge              node {a} (C)
+            edge [loop above] node {g,t} (A)
+        (B) edge 			 node {g} (D)
+        (D) edge              node {g} (F)
+        (C) edge              node {c} (E)
+        (E) edge              node {g} (G)
+        		edge              node {t} (H)
+		(H) edge              node {a} (I);
+	\path 
+		(B) edge	 [dashed, bend left=20] node {} (A)
+		(C) edge	 [dashed, bend right=30] node {} (A)
+		(D) edge	 [dashed, bend left=70] node {} (A)
+		(F) edge	 [dashed, bend left=60] node {} (A)
+		(E) edge	 [dashed, bend right=40] node {} (B)
+		(G) edge	 [dashed, bend left=20] node {} (D)
+		(H) edge	 [dashed, bend right=50] node {} (A)
+		(I) edge	 [dashed, bend right=40] node {} (C);
+\end{tikzpicture}
+\caption[Ejemplo: función goto y failure]{Función goto y failure}
+	\label{fig:failure_function}
+\end{figure}
+\end{example*}
+\myrule{}{}
+Una vez construida la estructura de datos descrita en esta sección, se utiliza la misma como se muestra en el algoritmo {\ref{Algorithm:failure_step1}}.\\
+\begin{algorithm}[h]
+\small
+\caption{Utilización de la estructura AC para reconocer patrones en un {\emph texto}}
+\label{Algorithm:failure_step1}
+\begin{algorithmic}[1]
+	\State $st \gets 0$
+	\ForAll {$i = 1..n$}
+		\While {{\it goto(st, $T[i]$) = $\emptyset$}}
+			\State $st \gets {\it failure(st)}$
+		\EndWhile	
+		\If {\it output(st) $\not= \emptyset$}
+			\State Incrementar el contador de ocurrencias de todos los elementos de output(st).
+		\EndIf
+	\EndFor
+	\Statex
+\end{algorithmic}
+  \vspace{-0.4cm}%
+\end{algorithm}
+Comenzando en el nodo 0 de la estructura se procede a leer secuencialmente cada uno de los caracteres del {\emph texto}. Dado un estado {\it st}, al leer un carácter $T[i]$ del {\emph texto}, se invoca en primera instancia la función {\it goto(st,$T[i]$)}, si dicha función falla se realiza una nevegación hacia {\it st = failure(st)} y se repite el procedimiento con el nuevo nodo {\it st}. Si por el contrario {\it goto(st,$T[i]) \not= \emptyset$}, se realiza una navegación hacia {\it st} y se invoca {\it output(st)}. En caso que la función {\it output(st)} no sea vacía se habrá encontrado al menos un acierto.
+\section{Implementación}
+En esta sección se describen los aspectos más relevantes de la implementación en lenguaje C++ del algoritmo AC realizada para este proyecto. \\
+Como se explicó en la sección anterior, la construcción de la estructura de datos de AC se realiza en etapas. En la etapa más temprana (cuando se agregan los patrones) la estructura coincide con una estructura trie. No es necesario almacenar de forma explícita los caracteres que forman cada uno de los patrones, ya que dicha información queda representada implícitamente en la relación nodo padre - nodo hijo. En fases posteriores de la construcción de la estructura de AC, se realiza (sobre el trie) una secuencia de pasos para construir las funciones {\it goto}, {\it failure} y {\it output}.\\
+La estructura arborescente se conserva luego de construir dichas funciones, pero sobre los nodos del árbol se agregan aristas y vectores que definen a {\it failure} y {\it output} respectivamente. Considerando la estructura completa (con las aristas del árbol original y las añadidas para definir {\it failure}) se tiene una estructura final de grafo.\\
+La definición de la estructura de AC se encuentra en {\bf AhoCorasickNode.h}, la misma tiene cuatro atributos sobre los cuales se basa (Ver el fragmento de código {\ref{lst:codigo_1}}).
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+\begin{lstlisting}[caption=Representación de los nodos en AC, label={lst:codigo_1}]
+AhoCorasickNode *children [ALPHABET_SIZE];
+AhoCorasickNode *fail;
+int *output;
+int outputcount;
+\end{lstlisting}
+La constante {\bf ALPHABET\_SIZE} representa la cantidad de caracteres del alfabeto (por más información ver el apéndice \ref{AppendixB}).El arreglo  {\it children} representa la función {\it goto} en cada nodo.\\
+El puntero {\it fail} define para cada nodo la función {\it failure}. \\
+La función {\it output} es representada mediante un arreglo dinámico de enteros y un contador ({\it outputcount}) que almacena la cantidad de datos presentes en dicho vector. A cada uno de los patrones insertados en la estructura se le asigna un identificador secuencial numérico; estos valores son guardados (cuando corresponde hacerlo) dentro de {\it output}. Otra posible implementación de {\it output} se obtiene al usar la clase {\it Vector} de la {\it standard template library}, sin embargo, nuestras pruebas mostraron que una implementación así resulta más costosa en tiempo de ejecución. \\
+Cada patrón es insertado en AC invocando al método {\it addPattern}, el cual se encuentra implementado en el módulo {\bf AhoCorasickGraph}. Este método recibe como parámetro una cadena de caracteres (la cual representa a un patrón) y el identificador que se le asignó a dicho patrón. Como puede apreciarse en el fragmento de código {\ref{lst:codigo_2}}, este procedimiento comienza la inserción partiendo desde el nodo raíz del árbol AC, luego, para cada carácter del patrón {\it word} el procedimiento analiza si ya existe o no un nodo en la estructura que represente a la secuencia leída hasta el momento. Se utiliza un arreglo, al cual nombramos \emph{ordchar}, para obtener en O(1) el índice que tiene asignado cada símbolo del alfabeto (representado en ASCII) en el arreglo de descendientes ({\it children}). Finalmente {\it addPattern} realiza un movimiento en la estructura en dirección al carácter procesado; en caso de que no exista un nodo en dicha dirección el mismo es creado.
+
+\begin{lstlisting}[caption=Representación de los nodos en AC, label={lst:codigo_2}]
+void AhoCorasickGraph::addPattern(const char* word,
+ int wordIndex) {
+	AhoCorasickNode* currentNode = root;
+	AhoCorasickNode* child = NULL;
+	int index = 0;
+	int aux;
+	while (word[index] != '\0') {
+        aux = ordChar[(int) word[index]];
+		child = currentNode->children[aux];
+		if (!child) {
+			child = new AhoCorasickNode();
+			currentNode->children[aux] = child;
+		}
+		currentNode = child;
+		index++;
+	}
+	currentNode->addOutput(wordIndex);
+}
+\end{lstlisting}
+
+Una vez se insertan todos los patrones a la estructura inicial se procede con la ejecución del método {\it setFailTransitions}. Este método completa la función {\it goto} en el nodo raíz e implementa las dos fases descritas en el algoritmo {\ref{Algorithm:failure_step2}}.
+La implementación de este método se muestra en el fragmento de código {\ref{lst:codigo_3}}
+\begin{lstlisting}[caption=Creación de la función failure, label={lst:codigo_3}]
+void AhoCorasickGraph::setFailTransitions(int numberOfPatterns) {
+    founds = (int*)calloc(numberOfPatterns, sizeof(int));
+	Queue* queue = new Queue();
+	//1) f(s) <- 0 para todo s con profundidad 1
+	AhoCorasickNode* child = NULL;
+	AhoCorasickNode* state = NULL;
+	int currentSymbol;
+	for (int childIndex = 0; childIndex < ALPHABET_SIZE;
+	 childIndex++) {
+		currentSymbol = (int) ordChar[(int)alphabet[childIndex]];
+		child = root->children[currentSymbol];
+		if (child) {
+			child->fail = root;
+			queue->addNode(child);
+		}
+		else {
+			root->children[currentSymbol] = root;
+		}
+	}
+	//2) se configura failure en los estados con profundidad d > 1
+	while (!queue->isEmpty()) {
+		AhoCorasickNode* r = queue->getNextNode();
+		for (int childIndex = 0; childIndex < ALPHABET_SIZE;
+		 childIndex++) {
+			currentSymbol = ordChar[(int)alphabet[childIndex]];
+			child = r->children[currentSymbol];
+			if (child) {
+				queue->addNode(child);
+				state = r->fail;
+				while (!state->children[currentSymbol]) {
+					state = state->fail;
+				}
+				child->fail = state->children[currentSymbol];
+				child->outputUnion();
+			}
+		}
+	}
+	delete queue;
+}
+\end{lstlisting}
+El procedimiento {\it setFailTransitions} también crea una tabla ({\it founds}) que es utilizada para almacenar la cantidad de apariciones de cada patrón en el texto. Otra posible solución al problema de almacenar la cantidad de ocurrencias de cada patrón en el texto es agregar a la definición del nodo AC un atributo que cuente las veces que el algoritmo de procesamiento pasa por cada nodo. La desventaja de hacer la implementación de esa forma es que todos los nodos que no representen el reconocimiento de algún patrón deben almacenar un entero que no se modificará. Además, como un mismo patrón puede ser reconocido en varios nodos (en el ejemplo de la figura \ref{fig:failure_function} el patrón "cg" es reconocido en los nodos C y F) sería necesario implementar una etapa de post procesamiento para obtener la cantidad de veces que se encuentra cada uno de los patrones dentro del {\emph texto} procesado.\\
+El procedimiento {\it outputUnion} implementa la unión de patrones a ser reconocidos en el nodo que lo invoca, la definición de esta función se presenta en la línea 16 del algoritmo {\ref{Algorithm:failure_step2}}.\\
+Una vez finalizada la construcción de la estructura de datos se procesa el texto. Cada bloque leído del  texto es enviado al procedimiento {\it updateGraph}. Este procedimiento actualiza la posición actual dentro de la estructura de datos y la tabla {\it founds} a partir de cada carácter del bloque.\\
+El código {\ref{lst:codigo_4}} es una implementación del algoritmo \ref{Algorithm:failure_step1}.
+\begin{lstlisting}[caption=Actualización de la estructura , label={lst:codigo_4}]
+void AhoCorasickGraph::updateGraph(char block[], size_t bytCount) {
+    int alphabetIndex;
+    for (Uint blockIndex = 0; blockIndex < bytCount; blockIndex++) {
+        alphabetIndex = ordChar[(int)block[blockIndex]];
+        AhoCorasickNode* nextNode = currentPosition->children[alphabetIndex];
+        while (!nextNode) {
+            nextNode = currentPosition->fail;
+            currentPosition = nextNode;
+            nextNode = currentPosition->children[alphabetIndex];
+        }
+        currentPosition = nextNode;
+        int oLength = currentPosition->outputcount;
+        for (int outputIndex = 0; outputIndex < oLength; outputIndex++) {
+            founds[currentPosition->output[outputIndex]] += 1;
+        }
+    }
+}
+\end{lstlisting}
+La destrucción de la estructura se realiza en forma recursiva, recorriendo las aristas que forman el árbol en profunidad. Al momento de realizar la destrucción de la estructura se debe recordar que en el nodo ráiz se pueden presentar ciclos (causados por la función {\it goto}), por este motivo se identifica este nodo mediante la asignación de {\it outputcount} en -1. 

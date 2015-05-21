@@ -1,0 +1,11 @@
+% Appendix B
+
+\chapter{Testing} % Main appendix title
+
+\label{AppendixC} % For referencing this appendix elsewhere, use \ref{AppendixC}
+
+\lhead{Apéndice B. \emph{Testing}} % This is for the header on each page - perhaps a shortened title
+
+Se crearon doce juegos de patrones con diferentes características y doce textos los cuales son usados para probar la correctitud de los resultados finales arrojados por los algoritmos elaborados en esta tesis.\\
+En las pruebas presentadas se contempla una serie de configuraciones particulares de patrones, como por ejemplo patrones que son prefijos de otros, patrones capicúa (es decir patrones que se leen igual de izquierda a derecha que de derecha a izquierda), existencia de patrones repetidos en un mismo juego y ausencia total de patrones (juego de patrones vacío). También se incluyeron en las pruebas juegos de patrones con hasta 400.000 patrones.\\ 
+Los textos fueron seleccionados para probar diversos casos, entre ellos, la posibilidad que ningún patrón se encuentre, o, que por lo contrario, se encuentren todos los patrones en el textos.\\ Se comprobó, en forma manual, la correctitud de los algoritmos sobre los primeros 5 juegos de patrones contra un conjunto reducido de los textos utilizados en las pruebas.\\ Para la realización de pruebas automatizadas se creo un script {\it runAppTest.sh} el cual ejecuta todos los juegos de patrones contra todos los textos y compara la salida de los dos algoritmos. En caso de ocurrir alguna diferencia entre ambas salidas se despliega un mensaje indicando el fallo y se guarda los archivos de salida de ambos algoritmos. De esta forma se ejecuta un total de 144 pruebas automáticas de comparación entre ambos algoritmos. En la fase de desarrollo fue utilizado un conjunto de funciones para verificar la estrucutra creada por MSW. Algunas de dichas funciones permiten imprimir en pantalla la estructura de datos, comprobar la correcta inserción de patrones en fases tempranas de los algoritmos y que las estructuras finalmente generadas sean consistentes (por ejemplo dado un nodo se verifica que sus hijos tengan asignado correctamente el nodo padre). Para utilizar las funciones de pruebas se debe definir el macro {\it KDEBUG}.\\ Los juegos de pruebas mencionados en este apéndice pueden ser encontrados bajo el directorio {\it"Testing"} del entregable.

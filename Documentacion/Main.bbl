@@ -1,0 +1,70 @@
+\begin{thebibliography}{10}
+
+\bibitem{AC75}
+Alfred~V. Aho and Margaret~J. Corasick.
+\newblock Efficient string matching: an aid to bibliographic search.
+\newblock {\em Communications of the ACM}, 18(6):333--340, 1975.
+
+\bibitem{BAEZA}
+Ricardo Baeza-yates and Gonzalo Navarro.
+\newblock Faster approximate string matching.
+\newblock {\em Algorithmica}, 23:127--158, 1999.
+
+\bibitem{BM}
+Robert~S. Boyer and J.~Strother Moore.
+\newblock A fast string searching algorithm.
+\newblock {\em Commun. ACM}, 20(10):762--772, October 1977.
+
+\bibitem{GUS}
+Dan Gusfield.
+\newblock {\em Algorithms on Strings, Trees, and Sequences: Computer Science
+  and Computational Biology}.
+\newblock Cambridge University Press, New York, NY, USA, 1997.
+
+\bibitem{KARP}
+Richard~M. Karp and Michael~O. Rabin.
+\newblock Efficient randomized pattern-matching algorithms.
+\newblock {\em IBM J. Res. Dev.}, 31(2):249--260, March 1987.
+
+\bibitem{KMP}
+Donald~E. Knuth, J.H. Morris, and Vaughan~R. Pratt.
+\newblock Fast pattern matching in strings.
+\newblock {\em SIAM Journal of Computing}, 6(2):323--350, 1977.
+
+\bibitem{MSW04}
+Alvaro Martin, Gadiel Seroussi, and Marcelo~J. Weinberger.
+\newblock Linear time universal coding and time reversal of tree sources via
+  fsm closure.
+\newblock {\em IEEE Trans. Inform. Theory}, 50:1442--1468, 2004.
+
+\bibitem{PAT}
+Donald~R. Morrison.
+\newblock Patricia practical algorithm to retrieve information coded in
+  alphanumeric.
+\newblock {\em J. ACM}, 15(4):514--534, October 1968.
+
+\bibitem{website:fasta}
+NCBI.
+\newblock Fasta.
+
+\bibitem{website:iupac}
+Nomenclature~Committee of~the International Union~of Biochemistry.
+\newblock Nomenclatura iupac.
+
+\bibitem{bruce07}
+Bruce Jacob Spencer W.NG~David T.Wang.
+\newblock {\em Memory Systems Cache, DRAM, Disk}.
+\newblock Morgan Kaufmann; 1 edition, 2007.
+
+\bibitem{UK95}
+Esko Ukkonen.
+\newblock On-line construction of suffix trees, 1995.
+
+\bibitem{WEINER}
+Peter Weiner.
+\newblock Linear pattern matching algorithms.
+\newblock In {\em Proceedings of the 14th Annual Symposium on Switching and
+  Automata Theory (Swat 1973)}, SWAT '73, pages 1--11, Washington, DC, USA,
+  1973. IEEE Computer Society.
+
+\end{thebibliography}

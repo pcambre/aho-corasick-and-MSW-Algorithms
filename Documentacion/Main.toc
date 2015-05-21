@@ -1,0 +1,50 @@
+\select@language {spanish}
+\contentsline {chapter}{Agradecimientos}{\es@scroman {i}}{dummy.1}
+\vspace {1em}
+\contentsline {chapter}{Listado de figuras}{\es@scroman {iv}}{dummy.3}
+\contentsline {chapter}{Listado de tablas}{\es@scroman {vi}}{dummy.5}
+\contentsline {chapter}{Abreviaciones}{\es@scroman {vii}}{dummy.7}
+\contentsline {chapter}{\numberline {1}Introducci\IeC {\'o}n}{1}{chapter.10}
+\contentsline {chapter}{\numberline {2}Estado del arte}{3}{chapter.11}
+\contentsline {section}{\numberline {2.1}Nomenclatura y definiciones previas}{3}{section.12}
+\contentsline {section}{\numberline {2.2}Algoritmos de b\IeC {\'u}squeda de un \IeC {\'u}nico patr\IeC {\'o}n en un texto}{4}{section.13}
+\contentsline {subsection}{\numberline {2.2.1}Algoritmo de fuerza bruta}{4}{subsection.14}
+\contentsline {subsection}{\numberline {2.2.2}Knuth Morris Pratt (KMP)}{5}{subsection.16}
+\contentsline {subsection}{\numberline {2.2.3}Boyer Moore (BM)}{6}{subsection.18}
+\contentsline {subsubsection}{\numberline {2.2.3.1}Regla del car\IeC {\'a}cter malo}{7}{subsubsection.19}
+\contentsline {subsubsection}{\numberline {2.2.3.2}Regla fuerte del sufijo bueno}{8}{subsubsection.24}
+\contentsline {section}{\numberline {2.3}Algoritmos de b\IeC {\'u}squeda exacta de m\IeC {\'u}ltiples patrones en un texto}{9}{section.26}
+\contentsline {subsection}{\numberline {2.3.1}\IeC {\'A}rbol de prefijos o Trie}{10}{subsection.27}
+\contentsline {subsection}{\numberline {2.3.2}\IeC {\'A}rbol de sufijos}{11}{subsection.29}
+\contentsline {chapter}{\numberline {3}Aho Corasick}{14}{chapter.31}
+\contentsline {section}{\numberline {3.1}Algoritmo}{14}{section.33}
+\contentsline {section}{\numberline {3.2}Implementaci\IeC {\'o}n}{19}{section.38}
+\contentsline {chapter}{\numberline {4}Algoritmo basado en la clausura FSM de un \IeC {\'a}rbol de patrones (MSW)}{24}{chapter.121}
+\contentsline {section}{\numberline {4.1}Definiciones previas}{24}{section.122}
+\contentsline {subsection}{\numberline {4.1.1}\IeC {\'A}rbol GCT}{25}{subsection.123}
+\contentsline {subsection}{\numberline {4.1.2}Descomposici\IeC {\'o}n can\IeC {\'o}nica}{25}{subsection.125}
+\contentsline {subsection}{\numberline {4.1.3}\IeC {\'A}rbol $\mathcal {T}_{suf}$}{26}{subsection.126}
+\contentsline {subsection}{\numberline {4.1.4}Clausura FSM sobre un \IeC {\'a}rbol $\mathcal {T}$}{26}{subsection.128}
+\contentsline {section}{\numberline {4.2}Algoritmo}{29}{section.131}
+\contentsline {subsection}{\numberline {4.2.1}Algoritmo de construcci\IeC {\'o}n de la clausura FSM}{29}{subsection.132}
+\contentsline {section}{\numberline {4.3}Procesamiento y post procesamiento de texto utilizando la clausura FSM}{33}{section.137}
+\contentsline {section}{\numberline {4.4}Implementaci\IeC {\'o}n}{34}{section.139}
+\contentsline {subsection}{\numberline {4.4.1}Creaci\IeC {\'o}n de la clausura FSM}{34}{subsection.140}
+\contentsline {subsection}{\numberline {4.4.2}Procesamiento y post procesamiento del texto}{40}{subsection.252}
+\contentsline {chapter}{\numberline {5}Experimentaci\IeC {\'o}n}{42}{chapter.282}
+\contentsline {section}{\numberline {5.1}Ambiente y creaci\IeC {\'o}n de pruebas}{42}{section.283}
+\contentsline {section}{\numberline {5.2}Medidas}{45}{section.291}
+\contentsline {section}{\numberline {5.3}Pre procesamiento}{45}{section.292}
+\contentsline {section}{\numberline {5.4}Procesamiento sobre textos}{49}{section.298}
+\contentsline {subsection}{\numberline {5.4.1}Efecto del conjunto de patrones sobre el tiempo de procesamiento de texto}{50}{subsection.299}
+\contentsline {subsection}{\numberline {5.4.2}Efecto de los fallos de memoria cach\IeC {\'e} en el rendimiento de los algoritmos}{55}{subsection.325}
+\contentsline {subsubsection}{\numberline {5.4.2.1}Efecto del largo del texto sobre el tiempo de procesamiento de texto}{57}{subsubsection.329}
+\contentsline {section}{\numberline {5.5}Tiempo total de ejecuci\IeC {\'o}n}{58}{section.333}
+\contentsline {section}{\numberline {5.6}Conclusiones}{60}{section.337}
+\vspace {2em}
+\contentsline {chapter}{\numberline {A}Programa principal - PDG}{61}{appendix.338}
+\contentsline {chapter}{\numberline {B}Aspectos generales de la implementaci\IeC {\'o}n}{62}{appendix.340}
+\contentsline {section}{\numberline {B.1}Lectura de archivos}{63}{section.341}
+\contentsline {chapter}{\numberline {C}Testing}{65}{appendix.342}
+\vspace {2em}
+\contentsline {chapter}{Bibliograf\'{\i }a}{67}{dummy.343}
