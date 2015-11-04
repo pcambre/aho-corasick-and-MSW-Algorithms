@@ -4,32 +4,32 @@
 #define QUEUE_H_
 
 class Queue {
-	private:
-		QueueNode *firstNode;
-		QueueNode *lastNode;
-	public :
-		Queue();
-		~Queue();
-		
-		//Funciones inline 
-		
-		//Retorna un nodo del arbol AC, eliminando el mismo de la cola.
-		AhoCorasickNode* getNextNode() {
-			AhoCorasickNode* nodeToReturn = firstNode->item;
+    private:
+        QueueNode *firstNode;
+        QueueNode *lastNode;
+    public :
+        Queue();
+        ~Queue();
+        
+        //Funciones inline 
+        
+        //Retorna un nodo del arbol AC, eliminando el mismo de la cola.
+        AhoCorasickNode* getNextNode() {
+            AhoCorasickNode* nodeToReturn = firstNode->item;
             QueueNode* aux = firstNode;
-			firstNode = firstNode->nextNode;
-			if (!firstNode) {
-				lastNode = NULL;
+            firstNode = firstNode->nextNode;
+            if (!firstNode) {
+                lastNode = NULL;
             }
-			delete(aux);
-			return nodeToReturn;
-		}
+            delete(aux);
+            return nodeToReturn;
+        }
 
-		bool isEmpty() {
-			return(!firstNode);
-		}
-		
-		void addNode(AhoCorasickNode *node);
+        bool isEmpty() {
+            return(!firstNode);
+        }
+        
+        void addNode(AhoCorasickNode *node);
 
 };
 

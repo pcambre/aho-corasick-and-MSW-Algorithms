@@ -12,18 +12,18 @@ class AhoCorasickGraph {
         //Podria usarse estos atributos para evitar un post procesamiento
         //int* found;
         //int patterns;
-		AhoCorasickGraph();
-		~AhoCorasickGraph();
-    
-		//agrega patrones a la estructura inicial de AC
-		AhoCorasickNode* addPattern(const char* word, int wordIndex);
-    
+        AhoCorasickGraph();
+        ~AhoCorasickGraph();
+
+        //agrega patrones a la estructura inicial de AC
+        AhoCorasickNode* addPattern(const char* word, int wordIndex);
+
         //Crea la funcion de fallos
-		void setFailTransitions(int numberOfPatterns);
+        void setFailTransitions(int numberOfPatterns);
     
         //Dado un  bloque de caracteres leido desde el corpus
         //mueve el puntero actual dentro de la estrucutra de AC
-		void updateGraph(char block[], size_t bytCount);
+        void updateGraph(char block[], size_t bytCount);
 };
 
 #endif /* AHOCORASICKGRAPH_H_ */

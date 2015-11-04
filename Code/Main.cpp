@@ -40,8 +40,7 @@ stopclock;
  Esta funcion inicializa el reloj
  */
 
-void initclock(void)
-{
+void initclock(void) {
     startclock = clock();
 }
 
@@ -50,8 +49,7 @@ void initclock(void)
  del reloj medido en segundos
  */
 
-double getruntime(void)
-{
+double getruntime(void) {
     stopclock = clock();
     return (stopclock-startclock) / (double) CLOCKS_PER_SEC;
 }
@@ -60,8 +58,7 @@ double getruntime(void)
   \texttt{startclock} to \texttt{stopclock}
  */
 
-Uint getclockticks(void)
-{
+Uint getclockticks(void) {
     stopclock = clock();
     return (Uint) (stopclock-startclock);
 }
@@ -80,7 +77,6 @@ void ahoCorasick() {
     }
     
     AhoCorasickGraph *acg = new AhoCorasickGraph();
-    //char *patterns [numberOfPatterns];
     AhoCorasickNode *patternsNodes [numberOfPatterns];
     
     std::ifstream stream(patternsFileName);

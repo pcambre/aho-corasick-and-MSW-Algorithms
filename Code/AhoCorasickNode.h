@@ -10,17 +10,17 @@
 #include "AhoCorasickNode.h"
 
 class AhoCorasickNode {
-	private:
-		bool isItemInOutput(int wordIndex);
-	public:
+    private:
+        bool isItemInOutput(int wordIndex);
+    public:
         AhoCorasickNode *children [ALPHABET_SIZE];
         AhoCorasickNode *fail;
     // http://www.cplusplus.com/reference/clibrary/cstdlib/realloc/ otra posibilidad seria std::vector<int> output pero esta resulto ser mas costosa en la practica
         int* output;
         int outputcount;
-		AhoCorasickNode();
-		~AhoCorasickNode();
-		void addOutput(int wordIndex);
+        AhoCorasickNode();
+        ~AhoCorasickNode();
+        void addOutput(int wordIndex);
         void outputUnion();
 };
 

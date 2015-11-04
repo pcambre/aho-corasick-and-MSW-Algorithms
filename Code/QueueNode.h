@@ -5,12 +5,12 @@
 #define QUEUENODE_H_
 
 class QueueNode {
-	public:
+    public:
         AhoCorasickNode* item;
         QueueNode *nextNode;
-		QueueNode();
-		QueueNode(AhoCorasickNode* itemNode);
-		~QueueNode();		
+        QueueNode();
+        QueueNode(AhoCorasickNode* itemNode);
+        ~QueueNode();        
 };
 
 #endif /* QUEUENODE_H_ */
